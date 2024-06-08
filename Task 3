@@ -1,0 +1,115 @@
+#include <iostream>
+using namespace std;
+
+const int BOARD_SIZE = 3;
+char board[BOARD_SIZE][BOARD_SIZE];
+
+void initializeBoard() {
+    for (int i = 0; i < BOARD_SIZE; ++i) {
+        for (int j = 0; j < BOARD_SIZE; ++j) {
+            board[i][j] = '1' + i * BOARD_SIZE + j; // Initialize with 1-9 for easy input
+        }
+    }
+}
+
+void displayBoard() {
+    for (int i = 0; i < BOARD_SIZE; ++i) {
+        for (int j = 0; j < BOARD_SIZE; ++j) {
+            cout << board[i][j];
+            if (j < BOARD_SIZE - 1) cout << " | ";
+        }
+        cout << endl;
+        if (i < BOARD_SIZE - 1) cout << "--|---|--" << endl;
+    }
+}
+
+bool isWin(char player) {
+    // Check rows
+    for (int i = 0; i < BOARD_SIZE; ++i) {
+        if (board[i][0] == player && board[i][1] == player && board[i][2] == player) {
+            return true;
+        }
+    }
+
+    // Check columns
+    for (int i = 0; i < BOARD_SIZE; ++i) {
+        if (board[0][i] == player && board[1][i] == player && board[2][i] == player) {
+            return true;
+        }
+    }
+
+    // Check diagonals
+    if (board[0][0] == player && board[1][1] == player && board[2][2] == player) {
+        return true;
+    }
+    if (board[0][2] == player && board[1][1] == player && board[2][0] == player) {
+        return true;
+    }
+
+    return false;
+}
+
+bool isDraw() {
+    for (int i = 0; i < BOARD_SIZE; ++i) {
+        for (int j = 0; j < BOARD_SIZE; ++j) {
+            if (board[i][j] != 'X' && board[i][j] != 'O') {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+void switchPlayer(char &player) {
+    player = (player == 'X') ? 'O' : 'X';
+}
+
+bool isMoveValid(int move) {
+    int row = (move - 1) / BOARD_SIZE;
+    int col = (move - 1) % BOARD_SIZE;
+    return move >= 1 && move <= 9 && board[row][col] != 'X' && board[row][col] != 'O';
+}
+
+void getPlayerMove(char player) {
+    int move;
+    while (true) {
+        cout << "Player " << player << ", enter your move (1-9): ";
+        cin >> move;
+        if (isMoveValid(move)) {
+            int row = (move - 1) / BOARD_SIZE;
+            int col = (move - 1) % BOARD_SIZE;
+            board[row][col] = player;
+            break;
+        } else {
+            cout << "Invalid move. Try again." << endl;
+        }
+    }
+}
+
+int main() {
+    char player = 'X';
+    char playAgain;
+
+    do {
+        initializeBoard();
+        while (true) {
+            displayBoard();
+            getPlayerMove(player);
+            if (isWin(player)) {
+                displayBoard();
+                cout << "Player " << player << " wins!" << endl;
+                break;
+            }
+            if (isDraw()) {
+                displayBoard();
+                cout << "It's a draw!" << endl;
+                break;
+            }
+            switchPlayer(player);
+        }
+        cout << "Do you want to play again? (y/n): ";
+        cin >> playAgain;
+    } while (playAgain == 'y');
+
+    return 0;
+}
